@@ -1,0 +1,2 @@
+# DeepLearning2
+ゼロから作るDeepLearning2についての学習用
