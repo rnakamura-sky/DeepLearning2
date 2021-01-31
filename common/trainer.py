@@ -70,7 +70,7 @@ def remove_duplicate(params, grads):
         for i in range(0, L - 1):
             for j in range(i + 1, L):
                 if params[i] is params[j]:
-                    grads += grads[j]
+                    grads[i] += grads[j]
                     find_flg = True
                     params.pop(j)
                     grads.pop(j)
