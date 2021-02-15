@@ -1,5 +1,5 @@
 import numpy as np
-from common.layes import Embedding
+from common.layers import Embedding
 from common.functions import softmax
 
 class RNN:
@@ -180,3 +180,16 @@ class TimeSoftmaxWithLoss:
         self.cache = (ts, ys, mask, (N, T, V))
         return loss
     
+    def backward(self, dout=1):
+        ts, ys, mask, (N, T, V) = self.cache
+
+        dx = ys
+        dx[np.arange(N * T), ts] -= 1
+        dx *= dout
+        dx /= mask.sum()
+        dx *= mask[:, np.newaxis]
+
+        dx = dx.reshape((N, T, V))
+
+        return dx
+
