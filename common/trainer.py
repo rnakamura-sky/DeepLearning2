@@ -25,7 +25,7 @@ class Trainer:
         start_time = time.time()
         for epoch in range(max_epoch):
             # shuffle
-            idx = np.random.permutation(data_size)
+            idx = np.random.permutation(np.arange(data_size))
             x = x[idx]
             t = t[idx]
 
