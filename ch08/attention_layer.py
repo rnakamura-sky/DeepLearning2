@@ -4,6 +4,7 @@ sys.path.append('..')
 import numpy as np
 from common.layers import Softmax
 
+
 class WeightSum:
     def __init__(self):
         self.params, self.grads = [], []
@@ -12,7 +13,8 @@ class WeightSum:
     def forward(self, hs, a):
         N, T, H = hs.shape
 
-        ar = a.reshape(N, T, 1).repeat(H, axis=2)
+        # ar = a.reshape(N, T, 1).repeat(H, axis=2)
+        ar = a.reshape(N, T, 1)#.repeat(T, axis=1)
         t = hs * ar
         c = np.sum(t, axis=1)
 
@@ -22,13 +24,13 @@ class WeightSum:
     def backward(self, dc):
         hs, ar = self.cache
         N, T, H = hs.shape
-
         dt = dc.reshape(N, 1, H).repeat(T, axis=1)
         dar = dt * hs
         dhs = dt * ar
         da = np.sum(dar, axis=2)
 
         return dhs, da
+
 
 class AttentionWeight:
     def __init__(self):
@@ -39,10 +41,10 @@ class AttentionWeight:
     def forward(self, hs, h):
         N, T, H = hs.shape
 
-        hr = h.reshape(N, 1, H).repeat(T, axis=1)
+        hr = h.reshape(N, 1, H)#.repeat(T, axis=1)
         t = hs * hr
         s = np.sum(t, axis=2)
-        a = self.softmax(s)
+        a = self.softmax.forward(s)
 
         self.cache = (hs, hr)
         return a
@@ -51,13 +53,14 @@ class AttentionWeight:
         hs, hr = self.cache
         N, T, H = hs.shape
 
-        ds = self.softmax(da)
+        ds = self.softmax.backward(da)
         dt = ds.reshape(N, T, 1).repeat(H, axis=2)
         dhs = dt * hr
         dhr = dt * hs
         dh = np.sum(dhr, axis=1)
 
         return dhs, dh
+
 
 class Attention:
     def __init__(self):
@@ -78,6 +81,7 @@ class Attention:
         dhs = dhs0 + dhs1
         return dhs, dh
 
+
 class TimeAttention:
     def __init__(self):
         self.params, self.grads = [], []
@@ -92,19 +96,21 @@ class TimeAttention:
 
         for t in range(T):
             layer = Attention()
-            out[:, t, :] = layer.forward(hs_enc, hs_dec[:, t, :])
+            out[:, t, :] = layer.forward(hs_enc, hs_dec[:,t,:])
             self.layers.append(layer)
             self.attention_weights.append(layer.attention_weight)
+
         return out
     
     def backward(self, dout):
         N, T, H = dout.shape
-        dhs_enc =  0
+        dhs_enc = 0
         dhs_dec = np.empty_like(dout)
 
         for t in range(T):
             layer = self.layers[t]
             dhs, dh = layer.backward(dout[:, t, :])
             dhs_enc += dhs
-            dhs_enc[:, t,:] = dh
+            dhs_dec[:,t,:] = dh
+            
         return dhs_enc, dhs_dec

@@ -3,7 +3,7 @@ import sys
 sys.path.append('..')
 import numpy as np
 from common.time_layers import TimeEmbedding, TimeLSTM, TimeAffine, TimeSoftmaxWithLoss
-from seq2seq import Seq2seq, Encoder
+from ch07.seq2seq import Seq2seq, Encoder
 
     
 class PeekyDecoder:

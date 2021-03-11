@@ -87,6 +87,7 @@ class Decoder:
 
             sample_id = np.argmax(score.flatten())
             sampled.append(int(sample_id))
+
         return sampled
 
 

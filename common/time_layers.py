@@ -34,6 +34,7 @@ class RNN:
 
         return dx, dh_prev
 
+
 class TimeRNN:
     def __init__(self, Wx, Wh, b, stateful=False):
         self.params = [Wx, Wh, b]
@@ -81,6 +82,7 @@ class TimeRNN:
         for i, grad in enumerate(grads):
             self.grads[i][...] = grad
         self.dh = dh
+
         return dxs
     
     def set_state(self, h):
@@ -154,6 +156,7 @@ class LSTM:
 
         return dx, dh_prev, dc_prev
 
+
 class TimeLSTM:
     def __init__(self, Wx, Wh, b, stateful=False):
         self.params = [Wx, Wh, b]
@@ -181,6 +184,7 @@ class TimeLSTM:
             layer = LSTM(*self.params)
             self.h, self.c = layer.forward(xs[:, t, :], self.h, self.c)
             hs[:, t, :] = self.h
+
             self.layers.append(layer)
         
         return hs
@@ -211,6 +215,7 @@ class TimeLSTM:
     
     def reset_state(self):
         self.h, self.c = None, None
+
 
 class TimeEmbedding:
     def __init__(self, W):
@@ -245,6 +250,7 @@ class TimeEmbedding:
         self.grads[0][...] = grad
         return None
 
+
 class TimeAffine:
     def __init__(self, W, b):
         self.params = [W, b]
@@ -267,6 +273,7 @@ class TimeAffine:
 
         dout = dout.reshape(N*T, -1)
         rx = x.reshape(N*T, -1)
+
         db = np.sum(dout, axis=0)
         dW = np.dot(rx.T, dout)
         dx = np.dot(dout, W.T)
@@ -276,6 +283,7 @@ class TimeAffine:
         self.grads[1][...] = db
 
         return dx
+    
     
 class TimeSoftmaxWithLoss:
     def __init__(self):
